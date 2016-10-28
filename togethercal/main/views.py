@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django import forms
 from django.conf import settings
@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 import dateparser
 from datetime import datetime, date, timedelta
+import logging
 
 from models import Occurrence, OneTimeEvent, SpecialDay, WeeklyActivity
 
@@ -35,7 +36,6 @@ def form_view(request, form_type):
     cls = FORM_TYPES[form_type]
     form = cls(request)
     if form.is_valid():
-        print form.cleaned_data
         e = form.save()
         e.create_occurrences()
     return render(request, 'form.html', locals())
@@ -43,9 +43,16 @@ def form_view(request, form_type):
 
 @csrf_exempt
 def inbound_mail_view(request):
-    import logging
-    logging.info(request.GET)
-    logging.info(request.POST)
+    sender = request.POST['from']
+    subject = request.POST['subject']
+    text = request.POST['text']
+    data = dict(title=subject, start_date=text)
+    form = InboundMailForm(data)
+    if form.is_valid():
+        e = form.save()
+        e.create_occurrences()
+    else:
+        logging.info(form.as_p())
     return HttpResponse('OK')
 
 
@@ -56,6 +63,39 @@ def _parse(date_str, base=None):
         languages=[settings.LANGUAGE_CODE],
         settings=dict(PREFER_DATES_FROM='future', RETURN_AS_TIMEZONE_AWARE=True, RELATIVE_BASE=base)
     )
+
+
+class InboundMailForm(forms.ModelForm):
+
+    start_date = forms.CharField(label=u'התחלה', max_length=200)
+    end_date = forms.CharField(label=u'סיום', max_length=200, required=False)
+
+    class Meta:
+        model = OneTimeEvent
+        fields = ('title', 'start_date', 'end_date')
+
+    def _parse_start(self):
+        start = self.cleaned_data.get('start_date', '')
+        if isinstance(start, datetime):
+            return start
+        return _parse(start)
+
+    def clean_start_date(self):
+        if self.cleaned_data['start_date']:
+            start = self._parse_start()
+            print start
+            if not start:
+                raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
+            return start
+
+    def clean_end_date(self):
+        end = self.cleaned_data['end_date']
+        if end:
+            start = self._parse_start()
+            end = _parse(end, start)
+            if not end:
+                raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
+            return end
 
 
 class OneTimeEventForm(forms.ModelForm):
