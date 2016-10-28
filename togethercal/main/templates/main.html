@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="/static/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/slick/slick-theme.css"/>
+    <script type="text/javascript" src="/static/slick/slick.min.js"></script>  
+{% endblock %}
+
+{% block content %}
+
+    <div dir="rtl">
+
+    <div class="slider">
+      <div class="day">{{ today_html|safe }}</div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+      <div class="day"></div>
+    </div>
+
+    </div>
+
+    <script>
+        $(function(){
+          var n = $('.slider > .day').length - 1;
+          $('.slider').slick({
+            rtl: true,
+            infinite: false,
+          });
+          $('.slider').on('beforeChange', function(event, slick, currentSlide, nextSlide) {
+            var nextElem = $(slick.$slides[nextSlide]).eq(0);
+            nextElem.load('/day/?offset=' + nextSlide);
+
+          });
+        });
+    </script>
+{% endblock %}

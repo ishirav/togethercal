@@ -1,0 +1,40 @@
+body {
+    font-family: Rubik, Arial;
+    color: #333;
+}
+
+b, strong, label {
+    font-weight: 500;
+}
+
+.slick-prev, .slick-next {
+    top: 34px;
+}
+
+.slick-prev:before, .slick-next:before {
+    color: black;
+}
+
+.occurrence {
+    padding: 10px;
+    background-color: #f9f5f0;
+    border-right-style: solid;
+    border-right-width: 10px;
+    margin-bottom: 10px;
+}
+
+.occurrence.Holiday {
+    border-right-color: blue;
+}
+
+.occurrence.SpecialDay {
+    border-right-color: green;
+}
+
+.occurrence.WeeklyActivity {
+    border-right-color: orange;
+}
+
+.occurrence.OneTimeEvent {
+    border-right-color: red;
+}

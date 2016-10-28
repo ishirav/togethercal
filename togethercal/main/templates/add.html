@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-4">
+            <h1>הוספת אירוע</h1>
+            <p>
+                <a href="{% url "form" "O" %}?{{ request.META.QUERY_STRING }}" class="btn btn-primary btn-lg btn-block">
+                    אירוע חד פעמי
+                    <br>
+                    <small>פגישה, תור, מבחן, בילוי</small>
+                </a>
+            </p>
+            <p>
+                <a href="{% url "form" "S" %}?{{ request.META.QUERY_STRING }}" class="btn btn-primary btn-lg btn-block">
+                    תאריך מיוחד
+                    <br>
+                    <small>יום הולדת, יום נישואין, אזכרה</small>
+                </a>
+            </p>
+            <p>
+                <a href="{% url "form" "W" %}?{{ request.META.QUERY_STRING }}" class="btn btn-primary btn-lg btn-block">
+                    פעילות שבועית
+                    <br>
+                    <small>חוג, קורס</small>
+                </a>
+            </p>
+            <p>
+                <a href="{% url "main" %}" class="btn btn-default btn-lg btn-block" style="line-height: 48px;">ביטול</a>
+            </p>
+        </div>
+    </div>
+
+{% endblock %}
