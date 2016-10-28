@@ -5,6 +5,7 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 import dateparser
 from datetime import datetime, date, timedelta
@@ -40,6 +41,7 @@ def form_view(request, form_type):
     return render(request, 'form.html', locals())
 
 
+@csrf_exempt
 def inbound_mail_view(request):
     import logging
     logging.info(request.GET)
