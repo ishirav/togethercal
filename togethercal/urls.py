@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^add/$', views.add_view, name="add"),
     url(r'^$', views.main_view, name="main"),
     url(r'^form/(O|S|W)/$', views.form_view, name="form"),
+    url(r'^mail/inbound/$', views.inbound_mail_view, name="inbound_mail"),
     url(r'^admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

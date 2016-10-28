@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.http import HttpResponse
 from django.shortcuts import render
 from django import forms
 from django.conf import settings
@@ -15,11 +16,6 @@ def main_view(request):
     today = date.today()
     today_html = day_view(request, 0).content
     return render(request, 'main.html', locals())
-
-
-def list_view(request):
-    occurrences = Occurrence.objects.filter(date__gte=timezone.now().date())
-    return render(request, 'list.html', locals())
 
 
 def day_view(request, offset=None):
@@ -42,6 +38,13 @@ def form_view(request, form_type):
         e = form.save()
         e.create_occurrences()
     return render(request, 'form.html', locals())
+
+
+def inbound_mail_view(request):
+    import logging
+    logging.info(request.GET)
+    logging.info(request.POST)
+    return HttpResponse('OK')
 
 
 def _parse(date_str, base=None):
