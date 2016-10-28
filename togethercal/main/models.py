@@ -143,7 +143,7 @@ class OneTimeEvent(CalendarEvent):
 
     def create_occurrences(self, *args, **kwargs):
         d = self.start_date
-        while d <= self.end_date:
+        while d <= (self.end_date or self.start_date):
             Occurrence.objects.get_or_create(event=self, date=d.date())
             d += datetime.timedelta(days=1)
 
