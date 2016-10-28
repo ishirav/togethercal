@@ -1,0 +1,13 @@
+<div dir="rtl" style="font: 16px arial;">
+    {% if form.is_valid %}
+        <p>האירוע נוסף ליומן המשפחתי ביום {{ form.instance.start_date|date:"l j.m בשעה H:i" }}.</p>
+    {% else %}
+        <p>האירוע לא נוסף בשל בעיות במייל ששלחת:</p>
+        {{ form.non_field_errors }}
+        <ul>
+            {% for field in form %}
+                {% if field.errors %}<li>{{ field.label }} &ndash; {{ field.errors|striptags }}</li>{% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>

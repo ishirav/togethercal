@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 import dateparser
 from datetime import datetime, date, timedelta
@@ -44,18 +45,17 @@ def form_view(request, form_type):
 
 @csrf_exempt
 def inbound_mail_view(request):
-    sender = request.POST['from']
-    recipient = request.POST['to']
-    subject = request.POST['subject']
-    text = request.POST['text']
-    data = dict(title=subject, start_date=text)
-    form = InboundMailForm(data)
+    data = request.POST or request.GET
+    sender = data['from']
+    recipient = data['to']
+    subject = data['subject']
+    text = data['text']
+    form = InboundMailForm(dict(title=subject, start_date=text))
     if form.is_valid():
         e = form.save()
         e.create_occurrences()
-    else:
-        logging.info(form.as_p())
-    send_mail(u'Re: %s' % subject, u'שלום', recipient, [sender])
+    msg = render_to_string('inbound_mail_reply.html', dict(form=form))
+    send_mail(u'Re: %s' % subject, '', recipient, [sender], html_message=msg, fail_silently=False)
     return HttpResponse('OK')
 
 
@@ -86,7 +86,6 @@ class InboundMailForm(forms.ModelForm):
     def clean_start_date(self):
         if self.cleaned_data['start_date']:
             start = self._parse_start()
-            print start
             if not start:
                 raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
             return start
@@ -125,7 +124,6 @@ class OneTimeEventForm(forms.ModelForm):
     def clean_start_date(self):
         if self.cleaned_data['start_date']:
             start = self._parse_start()
-            print start
             if not start:
                 raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
             return start
