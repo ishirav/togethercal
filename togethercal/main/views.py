@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
 
 import dateparser
 from datetime import datetime, date, timedelta
@@ -44,6 +45,7 @@ def form_view(request, form_type):
 @csrf_exempt
 def inbound_mail_view(request):
     sender = request.POST['from']
+    recipient = request.POST['to']
     subject = request.POST['subject']
     text = request.POST['text']
     data = dict(title=subject, start_date=text)
@@ -53,6 +55,7 @@ def inbound_mail_view(request):
         e.create_occurrences()
     else:
         logging.info(form.as_p())
+    send_mail(u'Re: %s' % subject, u'שלום', recipient, [sender])
     return HttpResponse('OK')
 
 

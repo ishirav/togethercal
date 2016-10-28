@@ -147,3 +147,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_ROOT = BASE_DIR
 MEDIA_URL = '/media/'
+
+from local_settings import *
