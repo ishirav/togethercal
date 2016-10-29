@@ -27,6 +27,10 @@ b, strong, label {
     margin: 10px;
 }
 
+.occurrence.with-icon {
+    min-height: 68px;
+}
+
 .occurrence.Holiday {
     border-right-color: blue;
 }
