@@ -15,7 +15,7 @@ class SpecialDayAdmin(admin.ModelAdmin):
 
 class WeeklyActivityAdmin(admin.ModelAdmin):
 
-    list_display = ['title', 'day_of_the_week', 'start_time', 'end_time', 'except_holidays']
+    list_display = ['title', 'day_of_the_week', 'start_time', 'end_time', 'include_holidays']
 
 
 class OneTimeEventAdmin(admin.ModelAdmin):

@@ -10,7 +10,7 @@ from togethercal.icons.models import Icon, icon_for_text
 
 class CalendarEvent(models.Model):
 
-    title = models.CharField(max_length=200)
+    title = models.CharField(u'כותרת', max_length=200)
     icon  = models.ForeignKey(Icon, blank=True, null=True)
 
     objects = InheritanceManager()
@@ -30,8 +30,8 @@ class Holiday(CalendarEvent):
 
     source_url  = models.URLField('Source URL', blank=True, null=True)
     uid         = models.CharField('UID', max_length=200, blank=True, null=True)
-    start_date  = models.DateField()
-    end_date    = models.DateField()
+    start_date  = models.DateField(u'התחלה')
+    end_date    = models.DateField(u'סיום')
 
     class Meta:
         ordering = ('start_date', 'title')
@@ -58,8 +58,8 @@ class Holiday(CalendarEvent):
 class SpecialDay(CalendarEvent):
     # TODO validate day+month combo
 
-    month   = models.PositiveSmallIntegerField(choices=zip(range(1, 13), range(1, 13)))
-    day     = models.PositiveSmallIntegerField(choices=zip(range(1, 32), range(1, 32)))
+    month   = models.PositiveSmallIntegerField(u'חודש', choices=zip(range(1, 13), range(1, 13)))
+    day     = models.PositiveSmallIntegerField(u'יום', choices=zip(range(1, 32), range(1, 32)))
 
     class Meta:
         ordering = ('month', 'day')
@@ -90,12 +90,12 @@ DAYS_OF_THE_WEEK = (
 
 class WeeklyActivity(CalendarEvent):
 
-    start_date      = models.DateField()
-    end_date        = models.DateField()
-    day_of_the_week = models.PositiveSmallIntegerField(choices=DAYS_OF_THE_WEEK)
-    start_time      = models.TimeField()
-    end_time        = models.TimeField()
-    except_holidays = models.BooleanField(default=True)
+    start_date       = models.DateField(u'תאריך התחלה')
+    end_date         = models.DateField(u'תאריך סיום')
+    day_of_the_week  = models.PositiveSmallIntegerField(u'יום בשבוע', choices=DAYS_OF_THE_WEEK)
+    start_time       = models.TimeField(u'שעת התחלה')
+    end_time         = models.TimeField(u'שעת סיום')
+    include_holidays = models.BooleanField(u'כולל ימי חג', default=False)
 
     class Meta:
         ordering = ('day_of_the_week', 'title')
@@ -111,7 +111,7 @@ class WeeklyActivity(CalendarEvent):
     def create_occurrences(self, *args, **kwargs):
         # Determine which dates to skip (holidays)
         skipped_dates = set()
-        if self.except_holidays:
+        if not self.include_holidays:
             qs = Occurrence.objects.in_range(self.start_date, self.end_date, Holiday)
             skipped_dates.update(qs.values_list('date', flat=True))
         # Find the first date with the correct weekday

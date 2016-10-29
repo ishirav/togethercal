@@ -27,7 +27,7 @@
                 </a>
             </p>
             <p>
-                <a href="{% url "main" %}" class="btn btn-default btn-lg btn-block" style="line-height: 48px;">ביטול</a>
+                <a href="{% url "main" %}?{{ request.META.QUERY_STRING }}" class="btn btn-default btn-lg btn-block" style="line-height: 48px;">ביטול</a>
             </p>
         </div>
     </div>

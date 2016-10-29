@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.core.urlresolvers import reverse
 
 import dateparser
 from datetime import datetime, date, timedelta
@@ -40,6 +41,7 @@ def form_view(request, form_type):
     if form.is_valid():
         e = form.save()
         e.create_occurrences()
+        return HttpResponseRedirect(reverse('main') + '?' + request.META['QUERY_STRING'])
     return render(request, 'form.html', locals())
 
 
@@ -156,15 +158,25 @@ class WeeklyActivityForm(forms.ModelForm):
 
     heading = 'פעילות שבועית'
 
-    start_date = forms.CharField(label=u'התחלה', max_length=200, initial='1/9/%s' % datetime.now().year)
-    end_date = forms.CharField(label=u'סיום', max_length=200, required=False, initial='31/8/%s' % (datetime.now().year + 1))
+    start_date = forms.DateField(label=u'התחלה', widget=forms.SelectDateWidget)
+    end_date = forms.DateField(label=u'סיום', widget=forms.SelectDateWidget)
 
     class Meta:
         model = WeeklyActivity
         exclude = ('icon',)
+        widgets = {
+            'start_time': forms.TimeInput(attrs=dict(type='time')),
+            'end_time': forms.TimeInput(attrs=dict(type='time')),
+        }        
 
     def __init__(self, request):
-        super(WeeklyActivityForm, self).__init__(request.POST or None)
+        dt = _parse(request.GET.get('dt', 'היום'))
+        initial = dict(
+            start_date=date(date.today().year, 9, 1), 
+            end_date=date(date.today().year + 1, 8, 31),
+            day_of_the_week=dt.weekday()
+        )
+        super(WeeklyActivityForm, self).__init__(request.POST or None, initial=initial)
 
 
 FORM_TYPES = dict(
