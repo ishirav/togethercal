@@ -2,6 +2,11 @@
 
 {% load bootstrap3 %}
 
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="/static/clockpicker/bootstrap-clockpicker.min.css"/>
+    <script type="text/javascript" src="/static/clockpicker/bootstrap-clockpicker.min.js"></script>  
+{% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col-md-4">
@@ -17,4 +22,11 @@
             </form>
         </div>
     </div>
+
+    <script>
+        $('#id_start_time, #id_end_time').attr('autocomplete', 'off').clockpicker({
+            donetext: 'סגירה'
+        });
+    </script>
+
 {% endblock %}

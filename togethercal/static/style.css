@@ -50,3 +50,8 @@ b, strong, label {
 .slick-slide .btn {
     margin-right: 10px;
 }
+
+.clockpicker-popover {
+    direction: ltr;
+    right: initial;
+}
