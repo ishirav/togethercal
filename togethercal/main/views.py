@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
+from django.db import transaction
 
 import dateparser
 from datetime import datetime, date, timedelta
@@ -35,6 +36,7 @@ def add_view(request):
     return render(request, 'add.html', locals())
 
 
+@transaction.atomic
 def form_view(request, form_type):
     cls = FORM_TYPES[form_type]
     form = cls(request)
@@ -46,6 +48,7 @@ def form_view(request, form_type):
 
 
 @csrf_exempt
+@transaction.atomic
 def inbound_mail_view(request):
     data = request.POST or request.GET
     sender = data['from']
