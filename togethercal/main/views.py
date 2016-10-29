@@ -50,18 +50,24 @@ def form_view(request, form_type):
 @csrf_exempt
 @transaction.atomic
 def inbound_mail_view(request):
-    data = request.POST or request.GET
-    sender = data['from']
-    recipient = data['to']
-    subject = data['subject']
-    text = data['text']
-    form = InboundMailForm(dict(title=subject, start_date=text))
+    data       = request.POST or request.GET
+    sender     = data['from']
+    recipient  = data['to']
+    subject    = data['subject']
+    text       = data['text']
+    parts      = text.split(u' עד ')
+    start_date = parts[0]
+    end_date   = parts[1] if len(parts) > 1 else None
+    form       = InboundMailForm(dict(title=subject, start_date=start_date, end_date=end_date))
     if form.is_valid():
         e = form.save()
         e.create_occurrences()
     msg = render_to_string('inbound_mail_reply.html', dict(form=form))
-    send_mail(u'Re: %s' % subject, '', recipient, [sender], html_message=msg, fail_silently=False)
-    return HttpResponse('OK')
+    if request.GET: # for debugging
+        return HttpResponse(msg)
+    else:
+        send_mail(u'Re: %s' % subject, '', recipient, [sender], html_message=msg, fail_silently=False)
+        return HttpResponse('OK')
 
 
 def _parse(date_str, base=None):
