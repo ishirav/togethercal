@@ -164,10 +164,6 @@ class WeeklyActivityForm(forms.ModelForm):
     class Meta:
         model = WeeklyActivity
         exclude = ('icon',)
-        widgets = {
-            'start_time': forms.TimeInput(attrs=dict(type='time')),
-            'end_time': forms.TimeInput(attrs=dict(type='time')),
-        }        
 
     def __init__(self, request):
         dt = _parse(request.GET.get('dt', 'היום'))

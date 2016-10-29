@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.db.models import Q
+from django.utils.dates import MONTHS
 
 import datetime
 from model_utils.managers import InheritanceManager
@@ -58,7 +59,7 @@ class Holiday(CalendarEvent):
 class SpecialDay(CalendarEvent):
     # TODO validate day+month combo
 
-    month   = models.PositiveSmallIntegerField(u'חודש', choices=zip(range(1, 13), range(1, 13)))
+    month   = models.PositiveSmallIntegerField(u'חודש', choices=MONTHS.items())
     day     = models.PositiveSmallIntegerField(u'יום', choices=zip(range(1, 32), range(1, 32)))
 
     class Meta:
