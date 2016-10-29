@@ -55,3 +55,9 @@ b, strong, label {
     direction: ltr;
     right: initial;
 }
+
+
+.popover.top > .arrow:after {
+    margin-right: 0;
+    margin-left: -10px;
+}
