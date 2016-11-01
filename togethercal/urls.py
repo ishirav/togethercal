@@ -18,6 +18,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
+from django.contrib.auth import views as auth_views
 
 from togethercal.main import views
 
@@ -27,5 +28,6 @@ urlpatterns = [
     url(r'^$', views.main_view, name="main"),
     url(r'^form/(O|S|W)/$', views.form_view, name="form"),
     url(r'^mail/inbound/$', views.inbound_mail_view, name="inbound_mail"),
+    url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name="login"),
     url(r'^admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

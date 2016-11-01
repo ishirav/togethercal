@@ -1,24 +1,29 @@
 <div data-date="{{ the_day.isoformat }}">
-    <h3>יום {{ the_day|date:"l" }} {{ the_day|date:"j בF" }}</h3>
-    {% for occurrence in occurrences %}
-        <div class="occurrence {{ occurrence.event_class_name }} {% if occurrence.event.icon %}with-icon{% endif %}">
-            {% if occurrence.event.icon %}
-                <img src="{{ occurrence.event.icon.image.url }}" width="48" height="48" style="float: left;">
-            {% endif %}
-            <b>{{ occurrence.event }}</b>
-            {% with occurrence.get_hours as hours %}
-                {% if hours.0 or hours.1 %}
-                    <br>
-                    <bdo dir="ltr">
-                        {{ hours.0|default_if_none:"" }}
-                        {% if hours.0 and hours.1 %}&ndash;{% endif %}
-                        {{ hours.1|default_if_none:"" }}
-                    </bdo>
+    {% if request.user.is_anonymous %}
+        <br>
+        <a class="btn btn-warning" href="{% url "login" %}">כניסה למערכת</a>
+    {% else %}
+        <h3>יום {{ the_day|date:"l" }} {{ the_day|date:"j בF" }}</h3>
+        {% for occurrence in occurrences %}
+            <div class="occurrence {{ occurrence.event_class_name }} {% if occurrence.event.icon %}with-icon{% endif %}">
+                {% if occurrence.event.icon %}
+                    <img src="{{ occurrence.event.icon.image.url }}" width="48" height="48" style="float: left;">
                 {% endif %}
-            {% endwith %}
-        </div>
-    {% empty %}
-        <p>אין  אירועים.</p>
-    {% endfor %}
-    <a href="{% url "add" %}?dt={{ the_day|date:"d.m.Y" }}" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></a>
+                <b>{{ occurrence.event }}</b>
+                {% with occurrence.get_hours as hours %}
+                    {% if hours.0 or hours.1 %}
+                        <br>
+                        <bdo dir="ltr">
+                            {{ hours.0|default_if_none:"" }}
+                            {% if hours.0 and hours.1 %}&ndash;{% endif %}
+                            {{ hours.1|default_if_none:"" }}
+                        </bdo>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        {% empty %}
+            <p>אין  אירועים.</p>
+        {% endfor %}
+        <a href="{% url "add" %}?dt={{ the_day|date:"d.m.Y" }}" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i></a>
+    {% endif %}
 </div>

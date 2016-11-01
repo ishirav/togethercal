@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.contrib.auth.decorators import login_required
 
 import dateparser
 from datetime import datetime, date, timedelta
@@ -18,6 +19,7 @@ import logging
 from models import Occurrence, OneTimeEvent, SpecialDay, WeeklyActivity
 
 
+@login_required
 def main_view(request):
     days = [day_view(request, i).content for i in range(3)]
     return render(request, 'main.html', locals())
@@ -31,10 +33,12 @@ def day_view(request, offset=None):
     return render(request, 'day.html', locals())
 
 
+@login_required
 def add_view(request):
     return render(request, 'add.html', locals())
 
 
+@login_required
 @transaction.atomic
 def form_view(request, form_type):
     cls = FORM_TYPES[form_type]

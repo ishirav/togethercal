@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-4">
+            <h1>כניסה</h1>
+            <form method="post" action="{{ request.get_full_path }}">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary btn-lg">המשך</button>
+                {% endbuttons %}
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
