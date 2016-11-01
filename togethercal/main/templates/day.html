@@ -1,4 +1,4 @@
-<div>
+<div data-date="{{ the_day.isoformat }}">
     <h3>יום {{ the_day|date:"l" }} {{ the_day|date:"j בF" }}</h3>
     {% for occurrence in occurrences %}
         <div class="occurrence {{ occurrence.event_class_name }} {% if occurrence.event.icon %}with-icon{% endif %}">
@@ -6,22 +6,16 @@
                 <img src="{{ occurrence.event.icon.image.url }}" width="48" height="48" style="float: left;">
             {% endif %}
             <b>{{ occurrence.event }}</b>
-            {% if occurrence.event.weeklyactivity.start_time %}
-                <br><bdo dir="ltr">
-                    {{ occurrence.event.weeklyactivity.start_time }}
-                    &ndash;
-                    {{ occurrence.event.weeklyactivity.end_time }}
-                </bdo>
-            {% endif %}
-            {% if occurrence.event.onetimeevent.start_date %}
-                <br><bdo dir="ltr">
-                    {{ occurrence.event.onetimeevent.start_date|date:"H:i" }}
-                    {% if occurrence.event.onetimeevent.end_date %}
-                        &ndash;
-                        {{ occurrence.event.onetimeevent.end_date|date:"H:i" }}
-                    {% endif %}
-                </bdo>
-            {% endif %}
+            {% with occurrence.get_hours as hours %}
+                {% if hours.0 or hours.1 %}
+                    <br>
+                    <bdo dir="ltr">
+                        {{ hours.0|default_if_none:"" }}
+                        {% if hours.0 and hours.1 %}&ndash;{% endif %}
+                        {{ hours.1|default_if_none:"" }}
+                    </bdo>
+                {% endif %}
+            {% endwith %}
         </div>
     {% empty %}
         <p>אין  אירועים.</p>

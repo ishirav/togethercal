@@ -11,7 +11,9 @@
     <div dir="rtl" style="margin: 0 25px;">
 
     <div class="slider">
-      <div class="day">{{ today_html|safe }}</div>
+      {% for day in days %}
+        <div class="day">{{ day|safe }}</div>
+      {% endfor %}
       <div class="day"></div>
       <div class="day"></div>
       <div class="day"></div>
@@ -45,12 +47,40 @@
 
     <script>
 
+        // Get the slick object
+        function getSlick() {
+          return $('.slider').slick('getSlick');
+        }
+
+        // Load a day with the given offset
         function load(offset) {
-          var slick = $('.slider').slick('getSlick');
+          var slick = getSlick();
           var elem = $(slick.$slides[offset]).eq(0);
           elem.load('/day/?offset=' + offset);
         }
 
+        // Load all days that are shown, starting from the given offset
+        function loadVisible(offset) {
+          var count = $('.slider').slick('slickGetOption', 'slidesToShow');
+          for (var i = 0; i < count; i++) {
+            load(offset + i);
+          }
+        }
+
+        // Reload the currently shown days.
+        // In case there's a day change, reload the whole page.
+        function refresh() {
+          var first = $('.day > div').data('date');
+          var now = new Date().toISOString();
+          if (!now.startsWith(first)) {
+            window.location = '/';
+            return;
+          }
+          var offset = $('.slider').slick('slickCurrentSlide');
+          loadVisible(offset);
+        }
+
+        // Initialize the slider
         $(function(){
           var n = $('.slider > .day').length - 1;
           $('.slider').slick({
@@ -74,14 +104,14 @@
             ]            
           });
 
-          load(1);
-          load(2);
-          
+          // Load days when the slider is moved
           $('.slider').on('beforeChange', function(event, slick, currentSlide, nextSlide) {
-            load(nextSlide);
-            load(nextSlide + 1);
-            load(nextSlide + 2);
+            loadVisible(nextSlide);
           });
+
+          // Refresh every minute
+          setInterval(refresh, 60 * 1000);
+
         });
     </script>
 {% endblock %}

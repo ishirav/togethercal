@@ -4,6 +4,8 @@ from django.db.models import Q
 from django.utils.dates import MONTHS
 
 import datetime
+import time
+
 from model_utils.managers import InheritanceManager
 
 from togethercal.icons.models import Icon, icon_for_text
@@ -25,6 +27,9 @@ class CalendarEvent(models.Model):
 
     def create_occurrences(self, *args, **kwargs):
         raise NotImplementedError
+
+    def get_hours(self, date):
+        return (None, None)
 
 
 class Holiday(CalendarEvent):
@@ -125,6 +130,9 @@ class WeeklyActivity(CalendarEvent):
                 Occurrence.objects.get_or_create(event=self, date=d)
             d += datetime.timedelta(days=7) 
 
+    def get_hours(self, date):
+        return (self.start_time, self.end_time)
+
 
 class OneTimeEvent(CalendarEvent):
 
@@ -143,10 +151,16 @@ class OneTimeEvent(CalendarEvent):
             raise ValidationError('Start date cannot be later than end date.')
 
     def create_occurrences(self, *args, **kwargs):
-        d = self.start_date
+        d = self.start_date.replace(hour=0, minute=0, second=0, microsecond=0)
         while d <= (self.end_date or self.start_date):
             Occurrence.objects.get_or_create(event=self, date=d.date())
             d += datetime.timedelta(days=1)
+
+    def get_hours(self, date):
+        return (
+            self.start_date.time() if self.start_date.date() == date else None,
+            self.end_date.time() if self.end_date and self.end_date.date() == date else None
+        )
 
 
 class OccurrenceManager(models.Manager):
@@ -183,10 +197,12 @@ class Occurrence(models.Model):
     def get_sorting_key(self):
         event = self.get_event_as_subclass()
         if isinstance(event, Holiday):
-            return -30
-        if isinstance(event, SpecialDay):
             return -20
-        if isinstance(event, OneTimeEvent):
+        if isinstance(event, SpecialDay):
             return -10
-        return event.start_time.hour * 60 + event.start_time.minute
+        if isinstance(event, OneTimeEvent):
+            return time.mktime(event.start_date.timetuple())
+        return time.mktime(datetime.datetime.combine(self.date, event.start_time).timetuple())
 
+    def get_hours(self):
+        return self.get_event_as_subclass().get_hours(self.date)

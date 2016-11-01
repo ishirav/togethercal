@@ -19,8 +19,7 @@ from models import Occurrence, OneTimeEvent, SpecialDay, WeeklyActivity
 
 
 def main_view(request):
-    today = date.today()
-    today_html = day_view(request, 0).content
+    days = [day_view(request, i).content for i in range(3)]
     return render(request, 'main.html', locals())
 
 
