@@ -28,6 +28,10 @@ class CalendarEvent(models.Model):
     def create_occurrences(self, *args, **kwargs):
         raise NotImplementedError
 
+    def recreate_occurrences(self):
+        self.occurrence_set.all().delete()
+        self.create_occurrences()
+        
     def get_hours(self, date):
         return (None, None)
 

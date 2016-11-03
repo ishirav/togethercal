@@ -5,7 +5,7 @@
     {% else %}
         <h3>יום {{ the_day|date:"l" }} {{ the_day|date:"j בF" }}</h3>
         {% for occurrence in occurrences %}
-            <div class="occurrence {{ occurrence.event_class_name }} {% if occurrence.event.icon %}with-icon{% endif %}">
+            <div id="{{ occurrence.id }}" class="occurrence {{ occurrence.event_class_name }} {% if occurrence.event.icon %}with-icon{% endif %}">
                 {% if occurrence.event.icon %}
                     <img src="{{ occurrence.event.icon.image.url }}" width="48" height="48" style="float: left;">
                 {% endif %}
@@ -13,11 +13,9 @@
                 {% with occurrence.get_hours as hours %}
                     {% if hours.0 or hours.1 %}
                         <br>
-                        <bdo dir="ltr">
-                            {{ hours.0|default_if_none:"" }}
-                            {% if hours.0 and hours.1 %}&ndash;{% endif %}
-                            {{ hours.1|default_if_none:"" }}
-                        </bdo>
+                        {{ hours.0|default_if_none:"" }}
+                        {% if hours.0 and hours.1 %}עד{% endif %}
+                        {{ hours.1|default_if_none:"" }}
                     {% endif %}
                 {% endwith %}
             </div>

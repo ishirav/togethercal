@@ -4,6 +4,7 @@
     <link rel="stylesheet" type="text/css" href="/static/slick/slick.css"/>
     <link rel="stylesheet" type="text/css" href="/static/slick/slick-theme.css"/>
     <script type="text/javascript" src="/static/slick/slick.min.js"></script>  
+    <script type="text/javascript" src="/static/jquery.mobile.custom.min.js"></script>  
 {% endblock %}
 
 {% block content %}
@@ -55,7 +56,7 @@
         // Load a day with the given offset
         function load(offset) {
           var slick = getSlick();
-          var elem = $(slick.$slides[offset]).eq(0);
+          var elem = $(slick.$slides[offset]).eq(0); // TODO handle array out of bounds
           elem.load('/day/?offset=' + offset);
         }
 
@@ -112,6 +113,9 @@
           // Refresh every minute
           setInterval(refresh, 60 * 1000);
 
+          $('.slider').on('taphold', '.OneTimeEvent, .SpecialDay', function() {
+            window.location = '/edit/' + this.id + '/';
+          })
         });
     </script>
 {% endblock %}

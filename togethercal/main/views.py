@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 import dateparser
 from datetime import datetime, date, timedelta
 import logging
+import pytz
 
 from models import Occurrence, OneTimeEvent, SpecialDay, WeeklyActivity
 
@@ -50,6 +51,20 @@ def form_view(request, form_type):
     return render(request, 'form.html', locals())
 
 
+@login_required
+@transaction.atomic
+def edit_view(request, pk):
+    occurrence = get_object_or_404(Occurrence, pk=pk)
+    event = occurrence.get_event_as_subclass()
+    cls = SpecialDayForm if isinstance(event, SpecialDay) else OneTimeEventForm
+    form = cls(request, instance=event)
+    if form.is_valid():
+        e = form.save()
+        e.recreate_occurrences()
+        return HttpResponseRedirect(reverse('main') + '?' + request.META['QUERY_STRING'])
+    return render(request, 'form.html', locals())
+
+
 @csrf_exempt
 @transaction.atomic
 def inbound_mail_view(request):
@@ -74,11 +89,11 @@ def inbound_mail_view(request):
 
 
 def _parse(date_str, base=None):
-    base = base or timezone.now()
+    base = base or datetime.now()
     return dateparser.parse(
         date_str, 
         languages=[settings.LANGUAGE_CODE],
-        settings=dict(PREFER_DATES_FROM='future', RETURN_AS_TIMEZONE_AWARE=True, RELATIVE_BASE=base)
+        settings=dict(PREFER_DATES_FROM='future', RETURN_AS_TIMEZONE_AWARE=False, RELATIVE_BASE=base)
     )
 
 
@@ -102,6 +117,7 @@ class InboundMailForm(forms.ModelForm):
             start = self._parse_start()
             if not start:
                 raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
+            start = start.replace(tz_info=pytz.UTC)
             return start
 
     def clean_end_date(self):
@@ -111,6 +127,7 @@ class InboundMailForm(forms.ModelForm):
             end = _parse(end, start)
             if not end:
                 raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
+            end = start.replace(tz_info=pytz.UTC)
             return end
 
 
@@ -125,9 +142,18 @@ class OneTimeEventForm(forms.ModelForm):
         model = OneTimeEvent
         fields = ('title', 'start_date', 'end_date')
 
-    def __init__(self, request):
-        initial = dict(start_date=request.GET.get('dt'), end_date=request.GET.get('dt'))
-        super(OneTimeEventForm, self).__init__(request.POST or None, initial=initial)
+    def __init__(self, request, instance=None):
+        if instance:
+            initial = dict(
+                start_date=instance.start_date.strftime(settings.DATETIME_INPUT_FORMATS[0]),
+                end_date=instance.end_date.strftime(settings.DATETIME_INPUT_FORMATS[0]) if instance.end_date else None
+            )
+        else:
+            initial = dict(
+                start_date=request.GET.get('dt'), 
+                end_date=request.GET.get('dt')
+            )
+        super(OneTimeEventForm, self).__init__(request.POST or None, initial=initial, instance=instance)
 
     def _parse_start(self):
         start = self.cleaned_data.get('start_date', '')
@@ -160,10 +186,10 @@ class SpecialDayForm(forms.ModelForm):
         model = SpecialDay
         fields = ('title', 'month', 'day')
 
-    def __init__(self, request):
+    def __init__(self, request, instance=None):
         dt = _parse(request.GET.get('dt', 'היום'))
-        initial = dict(month=dt.month, day=dt.day)
-        super(SpecialDayForm, self).__init__(request.POST or None, initial=initial)
+        initial = None if instance else dict(month=dt.month, day=dt.day)
+        super(SpecialDayForm, self).__init__(request.POST or None, initial=initial, instance=instance)
 
 
 class WeeklyActivityForm(forms.ModelForm):
@@ -177,14 +203,14 @@ class WeeklyActivityForm(forms.ModelForm):
         model = WeeklyActivity
         exclude = ('icon',)
 
-    def __init__(self, request):
+    def __init__(self, request, instance=None):
         dt = _parse(request.GET.get('dt', 'היום'))
-        initial = dict(
+        initial = None if instance else dict(
             start_date=date(date.today().year, 9, 1), 
             end_date=date(date.today().year + 1, 8, 31),
             day_of_the_week=dt.weekday()
         )
-        super(WeeklyActivityForm, self).__init__(request.POST or None, initial=initial)
+        super(WeeklyActivityForm, self).__init__(request.POST or None, initial=initial, instance=instance)
 
 
 FORM_TYPES = dict(

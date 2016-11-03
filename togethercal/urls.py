@@ -25,8 +25,9 @@ from togethercal.main import views
 urlpatterns = [
     url(r'^day/$', views.day_view, name="day"),
     url(r'^add/$', views.add_view, name="add"),
-    url(r'^$', views.main_view, name="main"),
     url(r'^form/(O|S|W)/$', views.form_view, name="form"),
+    url(r'^edit/(\d+)/$', views.edit_view, name="edit"),
+    url(r'^$', views.main_view, name="main"),
     url(r'^mail/inbound/$', views.inbound_mail_view, name="inbound_mail"),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name="login"),
     url(r'^admin/', admin.site.urls),
