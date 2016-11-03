@@ -17,6 +17,10 @@
                 {% buttons %}
                     <button type="submit" class="btn btn-primary btn-lg">שמירה</button>
                     &nbsp;
+                    {% if form.instance %}
+                        <button type="submit" class="btn btn-danger btn-lg" onclick="$('#id_action').val('delete');">מחיקה</button>
+                        &nbsp;
+                    {% endif %}
                     <a href="{% url "main" %}?{{ request.META.QUERY_STRING }}" class="btn btn-default btn-lg">ביטול</a>
                 {% endbuttons %}
             </form>

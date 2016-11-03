@@ -56,6 +56,9 @@ def form_view(request, form_type):
 def edit_view(request, pk):
     occurrence = get_object_or_404(Occurrence, pk=pk)
     event = occurrence.get_event_as_subclass()
+    if request.POST.get('action') == 'delete':
+        event.delete()
+        return HttpResponseRedirect(reverse('main') + '?' + request.META['QUERY_STRING'])
     cls = SpecialDayForm if isinstance(event, SpecialDay) else OneTimeEventForm
     form = cls(request, instance=event)
     if form.is_valid():
@@ -137,6 +140,7 @@ class OneTimeEventForm(forms.ModelForm):
 
     start_date = forms.CharField(label=u'התחלה', max_length=200)
     end_date = forms.CharField(label=u'סיום', max_length=200, required=False)
+    action = forms.CharField(widget=forms.HiddenInput, required=False)
 
     class Meta:
         model = OneTimeEvent
@@ -182,6 +186,8 @@ class SpecialDayForm(forms.ModelForm):
 
     heading = 'תאריך מיוחד'
 
+    action = forms.CharField(widget=forms.HiddenInput, required=False)
+
     class Meta:
         model = SpecialDay
         fields = ('title', 'month', 'day')
@@ -198,6 +204,7 @@ class WeeklyActivityForm(forms.ModelForm):
 
     start_date = forms.DateField(label=u'התחלה', widget=forms.SelectDateWidget)
     end_date = forms.DateField(label=u'סיום', widget=forms.SelectDateWidget)
+    action = forms.CharField(widget=forms.HiddenInput, required=False)
 
     class Meta:
         model = WeeklyActivity
