@@ -71,6 +71,7 @@
         // Reload the currently shown days.
         // In case there's a day change, reload the whole page.
         function refresh() {
+          if (document.hidden) return;
           var first = $('.day > div').data('date');
           var now = new Date().toISOString();
           if (!now.startsWith(first)) {
@@ -110,8 +111,9 @@
             loadVisible(nextSlide);
           });
 
-          // Refresh every minute
+          // Refresh every minute or when page becomes visible
           setInterval(refresh, 60 * 1000);
+          document.addEventListener("visibilitychange", refresh, false);
 
           $('.slider').on('taphold', '.OneTimeEvent, .SpecialDay', function() {
             window.location = '/edit/' + this.id + '/';
