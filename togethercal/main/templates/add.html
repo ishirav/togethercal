@@ -2,6 +2,19 @@
 
 {% block content %}
 
+    <style>
+        .btn {
+            font-weight: 500;
+        }
+        .btn small {
+            font-weight: 400;
+            font-size: 80%;
+        }
+        .btn-default {
+            line-height: 48px;
+        }
+    </style>
+
     <div class="row">
         <div class="col-md-4">
             <h1>הוספת אירוע</h1>
@@ -27,7 +40,7 @@
                 </a>
             </p>
             <p>
-                <a href="{% url "main" %}?{{ request.META.QUERY_STRING }}" class="btn btn-default btn-lg btn-block" style="line-height: 48px;">ביטול</a>
+                <a href="{% url "main" %}?{{ request.META.QUERY_STRING }}" class="btn btn-default btn-lg btn-block">ביטול</a>
             </p>
         </div>
     </div>
