@@ -120,7 +120,7 @@ class InboundMailForm(forms.ModelForm):
             start = self._parse_start()
             if not start:
                 raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
-            start = start.replace(tz_info=pytz.UTC)
+            start = start.replace(tzinfo=pytz.UTC)
             return start
 
     def clean_end_date(self):
@@ -130,7 +130,7 @@ class InboundMailForm(forms.ModelForm):
             end = _parse(end, start)
             if not end:
                 raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
-            end = start.replace(tz_info=pytz.UTC)
+            end = start.replace(tzinfo=pytz.UTC)
             return end
 
 
