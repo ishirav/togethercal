@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^form/(O|S|W)/$', views.form_view, name="form"),
     url(r'^edit/(\d+)/$', views.edit_view, name="edit"),
     url(r'^$', views.main_view, name="main"),
+    url(r'^month/$', views.month_view, name="month"),
     url(r'^mail/inbound/$', views.inbound_mail_view, name="inbound_mail"),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name="login"),
     url(r'^admin/', admin.site.urls),

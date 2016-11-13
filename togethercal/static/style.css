@@ -65,3 +65,40 @@ b, strong, label {
     margin-right: 0;
     margin-left: -10px;
 }
+
+table.month {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.month th, table.month td {
+    border: 1px solid #ccc;
+    padding: 5px;
+    width: 14.286%;
+}
+
+table.month th {
+    color: #fff;
+    background-color: #46a;
+}
+
+table.month td {
+    height: 60px;
+    vertical-align: top;
+}
+
+table.month td.sat,
+table.month td.holiday {
+    background-color: #ffd;
+}
+
+table.month td.noday {
+    background-color: #eee;
+}
+
+table.month img {
+    width: 20px;
+    height: 20px;
+    margin: 5px 0 0 5px;
+}
+

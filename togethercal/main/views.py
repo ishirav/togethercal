@@ -16,6 +16,7 @@ import dateparser
 from datetime import datetime, date, timedelta
 import logging
 import pytz
+from dateutil.relativedelta import relativedelta
 
 from models import Occurrence, OneTimeEvent, SpecialDay, WeeklyActivity
 
@@ -24,6 +25,16 @@ from models import Occurrence, OneTimeEvent, SpecialDay, WeeklyActivity
 def main_view(request):
     days = [day_view(request, i).content for i in range(3)]
     return render(request, 'main.html', locals())
+
+
+@login_required
+def month_view(request, offset=None):
+    from month_renderer import MonthRenderer
+    offset = offset or int(request.GET.get('offset', 0))
+    the_day = date.today().replace(day=1) + relativedelta(months=offset)
+    renderer = MonthRenderer()
+    month_html = renderer.formatmonth(the_day.year, the_day.month)
+    return render(request, 'month.html', locals())
 
 
 def day_view(request, offset=None):
