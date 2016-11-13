@@ -45,6 +45,8 @@ class MonthRenderer(HTMLCalendar):
                         classes.add('holiday')
                         content.append(escape(event.title) + '<br>')
                     elif isinstance(event, (SpecialDay, OneTimeEvent)):
+                        if not content:
+                            content.append('<br>')
                         if event.icon:
                             content.append('<img src="%s", title="%s">' % (event.icon.image.url, escape(event.title)))
             cssclass = ' '.join(classes)
