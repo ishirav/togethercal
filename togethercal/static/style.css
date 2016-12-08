@@ -55,6 +55,10 @@ b, strong, label {
     margin-right: 10px;
 }
 
+.form-control[readonly] {
+    background-color: #fff;
+}
+
 .clockpicker-popover {
     direction: ltr;
     right: initial;
