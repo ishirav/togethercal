@@ -44,8 +44,8 @@ class MonthRenderer(HTMLCalendar):
                     elif isinstance(event, (SpecialDay, OneTimeEvent)):
                         if not content:
                             content.append('<br>')
-                        if event.icon:
-                            content.append('<img src="%s", title="%s">' % (event.icon.image.url, escape(event.title)))
+                        icon = event.icon.image.url if event.icon else '/static/bell.png'
+                        content.append('<img src="%s", title="%s">' % (icon, escape(event.title)))
             cssclass = ' '.join(classes)
             return self.day_cell(curdate.strftime(settings.DATE_INPUT_FORMATS[0]), cssclass, day, ''.join(content))
         return self.day_cell('noday', 'noday', '', '')
