@@ -55,6 +55,10 @@ b, strong, label {
     margin-right: 10px;
 }
 
+.control-label {
+    white-space: nowrap;
+}
+
 .form-control[readonly] {
     background-color: #fff;
 }
