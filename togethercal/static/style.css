@@ -66,6 +66,14 @@ b, strong, label {
     margin-left: -10px;
 }
 
+.month-header {
+    text-align: center;
+}
+
+.month-header a {
+    margin: 0 20px;
+}
+
 table.month {
     width: 100%;
     border-collapse: collapse;

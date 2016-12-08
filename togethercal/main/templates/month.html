@@ -1,8 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h3>{{ the_day|date:"F Y" }}</h3>
-    <a class="btn btn-default" href="?offset={{ offset|add:"1" }}">+</a>
-    <a class="btn btn-default" href="?offset={{ offset|add:"-1" }}">-</a>
+    <h3 class="month-header">
+        <a class="btn btn-default" href="?offset={{ offset|add:"-1" }}"><i class="glyphicon glyphicon-chevron-right"></i></a>
+        {{ the_day|date:"F Y" }}
+        <a class="btn btn-default" href="?offset={{ offset|add:"1" }}"><i class="glyphicon glyphicon-chevron-left"></i></a>
+    </h3>
     {{ month_html|safe }}
+
+    <script>
+        $('.month tbody td').on('click', function() {
+            var dt = $(this).attr('data-day');
+            if (dt && dt != 'noday') {
+                window.location.href = '/?dt=' + dt;
+            }
+        })
+    </script>
+
 {% endblock %}

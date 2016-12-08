@@ -17,10 +17,6 @@ class MonthRenderer(HTMLCalendar):
         return ''
 
     def formatmonth(self, theyear, themonth, withyear=True):
-        # qs = CalendarEvent.objects.filter(calendar__in=self.hc, visible=True)
-        # qs = qs.filter(Q(start__year=theyear, start__month=themonth) | 
-        #                Q(end__year=theyear, end__month=themonth))
-        # self.events = list(qs)
         self.year = theyear
         self.month = themonth
         self.occurrences = list(Occurrence.objects.filter(date__year=theyear, date__month=themonth))
@@ -50,7 +46,7 @@ class MonthRenderer(HTMLCalendar):
                         if event.icon:
                             content.append('<img src="%s", title="%s">' % (event.icon.image.url, escape(event.title)))
             cssclass = ' '.join(classes)
-            return self.day_cell(curdate.isoformat(), cssclass, day, ''.join(content))
+            return self.day_cell(curdate.strftime('%d.%m.%Y'), cssclass, day, ''.join(content))
         return self.day_cell('noday', 'noday', '', '')
 
     def day_cell(self, curdate, cssclass, day, text):

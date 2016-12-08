@@ -23,7 +23,10 @@ from models import Occurrence, OneTimeEvent, SpecialDay, WeeklyActivity
 
 @login_required
 def main_view(request):
-    days = [day_view(request, i).content for i in range(3)]
+    offset = 0
+    dt = _parse(request.GET.get('dt', 'היום')).date()
+    offset = (dt - date.today()).days
+    days = [day_view(request, offset + i).content for i in range(3)]
     return render(request, 'main.html', locals())
 
 
