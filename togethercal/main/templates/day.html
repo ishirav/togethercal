@@ -14,8 +14,9 @@
                     {% if hours.0 or hours.1 %}
                         <br>
                         {{ hours.0|default_if_none:"" }}
-                        {% if hours.0 and hours.1 %}עד{% endif %}
-                        {{ hours.1|default_if_none:"" }}
+                        {% if hours.0 and hours.1 and hours.0 != hours.1 %}
+                            עד {{ hours.1 }}
+                        {% endif %}
                     {% endif %}
                 {% endwith %}
             </div>

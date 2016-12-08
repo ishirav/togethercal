@@ -2,6 +2,7 @@
 from django.db import models
 from django.db.models import Q
 from django.utils.dates import MONTHS
+from django.core.exceptions import ValidationError
 
 import datetime
 import time
@@ -53,7 +54,7 @@ class Holiday(CalendarEvent):
         super(Holiday, self).clean()
         # Check date range validity
         if self.start_date and self.end_date and self.start_date > self.end_date:
-            raise ValidationError('Start date cannot be later than end date.')
+            raise ValidationError('הסיום לא יכול להיות מוקדם מההתחלה.')
         # Prevent problems with unique_together when UID is empty
         if self.uid == '':
             self.uid = None
@@ -116,7 +117,7 @@ class WeeklyActivity(CalendarEvent):
         super(WeeklyActivity, self).clean()
         # Check date range validity
         if self.start_date and self.end_date and self.start_date > self.end_date:
-            raise ValidationError('Start date cannot be later than end date.')
+            raise ValidationError('הסיום לא יכול להיות מוקדם מההתחלה.')
 
     def create_occurrences(self, *args, **kwargs):
         # Determine which dates to skip (holidays)
@@ -152,8 +153,8 @@ class OneTimeEvent(CalendarEvent):
         super(OneTimeEvent, self).clean()
         # Check date range validity
         if self.start_date and self.end_date and self.start_date > self.end_date:
-            raise ValidationError('Start date cannot be later than end date.')
-
+            raise ValidationError('הסיום לא יכול להיות מוקדם מההתחלה.')
+            
     def create_occurrences(self, *args, **kwargs):
         d = self.start_date.replace(hour=0, minute=0, second=0, microsecond=0)
         while d <= (self.end_date or self.start_date):

@@ -13,7 +13,7 @@ from django.db import transaction
 from django.contrib.auth.decorators import login_required
 
 import dateparser
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, time
 import logging
 import pytz
 from dateutil.relativedelta import relativedelta
@@ -76,6 +76,7 @@ def edit_view(request, pk):
     cls = SpecialDayForm if isinstance(event, SpecialDay) else OneTimeEventForm
     form = cls(request, instance=event)
     if form.is_valid():
+        print form.cleaned_data
         e = form.save()
         e.recreate_occurrences()
         return HttpResponseRedirect(reverse('main') + '?' + request.META['QUERY_STRING'])
@@ -152,8 +153,10 @@ class OneTimeEventForm(forms.ModelForm):
 
     heading = 'אירוע חד פעמי'
 
-    start_date = forms.CharField(label=u'התחלה', max_length=200)
-    end_date = forms.CharField(label=u'סיום', max_length=200, required=False)
+    start_date = forms.DateField(label=u'תאריך התחלה', widget=forms.SelectDateWidget)
+    end_date = forms.DateField(label=u'תאריך סיום', required=False, widget=forms.SelectDateWidget)
+    start_time = forms.TimeField(label=u'שעת התחלה (לא חובה)', required=False)
+    end_time = forms.TimeField(label=u'שעת סיום (לא חובה)', required=False)
     action = forms.CharField(widget=forms.HiddenInput, required=False)
 
     class Meta:
@@ -163,37 +166,25 @@ class OneTimeEventForm(forms.ModelForm):
     def __init__(self, request, instance=None):
         if instance:
             initial = dict(
-                start_date=instance.start_date.strftime(settings.DATETIME_INPUT_FORMATS[0]),
-                end_date=instance.end_date.strftime(settings.DATETIME_INPUT_FORMATS[0]) if instance.end_date else None
+                start_date=instance.start_date.strftime(settings.DATE_INPUT_FORMATS[0]),
+                end_date=instance.end_date.strftime(settings.DATE_INPUT_FORMATS[0]) if instance.end_date else None,
+                start_time=instance.start_date.strftime(settings.TIME_INPUT_FORMATS[0]),
+                end_time=instance.end_date.strftime(settings.TIME_INPUT_FORMATS[0]) if instance.end_date else None
             )
         else:
-            initial = dict(
-                start_date=request.GET.get('dt'), 
-                end_date=request.GET.get('dt')
-            )
+            initial = dict(start_date=request.GET.get('dt'))
         super(OneTimeEventForm, self).__init__(request.POST or None, initial=initial, instance=instance)
 
-    def _parse_start(self):
-        start = self.cleaned_data.get('start_date', '')
-        if isinstance(start, datetime):
-            return start
-        return _parse(start)
-
-    def clean_start_date(self):
-        if self.cleaned_data['start_date']:
-            start = self._parse_start()
-            if not start:
-                raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
-            return start
-
-    def clean_end_date(self):
-        end = self.cleaned_data['end_date']
-        if end:
-            start = self._parse_start()
-            end = _parse(end, start)
-            if not end:
-                raise ValidationError(u'לא ניתן לפרש את התאריך או השעה')
-            return end
+    def clean(self):
+        cleaned_data = super(OneTimeEventForm, self).clean()
+        st = cleaned_data.get('start_time') or time(0, 0)
+        if cleaned_data['start_date']:
+            start = cleaned_data['start_date']
+            cleaned_data['start_date'] = datetime.combine(start, st)
+        if cleaned_data['end_date']:
+            end = cleaned_data['end_date']
+            et = cleaned_data.get('end_time') or st
+            cleaned_data['end_date'] = datetime.combine(end, et)
 
 
 class SpecialDayForm(forms.ModelForm):

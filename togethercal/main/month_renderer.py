@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.utils.html import escape
+from django.conf import settings
 
 from calendar import HTMLCalendar, month_name
 import datetime
@@ -46,7 +47,7 @@ class MonthRenderer(HTMLCalendar):
                         if event.icon:
                             content.append('<img src="%s", title="%s">' % (event.icon.image.url, escape(event.title)))
             cssclass = ' '.join(classes)
-            return self.day_cell(curdate.strftime('%d.%m.%Y'), cssclass, day, ''.join(content))
+            return self.day_cell(curdate.strftime(settings.DATE_INPUT_FORMATS[0]), cssclass, day, ''.join(content))
         return self.day_cell('noday', 'noday', '', '')
 
     def day_cell(self, curdate, cssclass, day, text):

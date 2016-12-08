@@ -135,6 +135,8 @@ USE_TZ = True
 
 DATE_INPUT_FORMATS = ('%d.%m.%Y', '%d/%m/%Y', '%Y-%m-%d', '%d.%m.%y', '%d/%m/%y')
 DATETIME_INPUT_FORMATS = ('%d.%m.%Y %H:%M', '%d/%m/%Y %H:%M', '%Y-%m-%d %H:%M', '%d.%m.%y %H:%M', '%d/%m/%y %H:%M')
+TIME_INPUT_FORMATS = ('%H:%M',)
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
@@ -154,5 +156,9 @@ MEDIA_URL = '/media/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 
+
+BOOTSTRAP3 = {
+    'set_placeholder': False
+}
 
 from local_settings import *
