@@ -83,6 +83,33 @@ def edit_view(request, pk):
     return render(request, 'form.html', locals())
 
 
+def ical_view(request):
+    from icalendar import Calendar, Event, Alarm
+    start = date.today().replace(day=1)
+    end = start + timedelta(days=365)
+    cal = Calendar()
+    cal.add('prodid', '-//TogetherCal//%s//HE' % request.META['HTTP_HOST'])
+    cal.add('version', '1.0')
+    cal['dtstart'] = start
+    cal['dtend'] = end
+    for occurrence in Occurrence.objects.filter(date__range=(start, end)).iterator():
+        e = occurrence.get_event_as_subclass()
+        if not isinstance(e, WeeklyActivity):
+            event = Event()
+            event.add('uid', '%d@%s' % (occurrence.pk, request.META['HTTP_HOST']))
+            event.add('summary', e.title)
+            event.add('dtstamp', occurrence.date)
+            event.add('class', 'PRIVATE')
+            event.add('categories', occurrence.event_class_name())
+            alarm = Alarm()
+            alarm.add('action', 'DISPLAY')
+            alarm.add('description', e.title)
+            alarm.add('trigger', timedelta(hours=-1))
+            event.add_component(alarm)
+            cal.add_component(event)
+    return HttpResponse(cal.to_ical(), content_type='text/plain')
+
+
 @csrf_exempt
 @transaction.atomic
 def inbound_mail_view(request):
