@@ -107,7 +107,7 @@ def ical_view(request):
             alarm.add('trigger', timedelta(hours=-1))
             event.add_component(alarm)
             cal.add_component(event)
-    return HttpResponse(cal.to_ical(), content_type='text/plain')
+    return HttpResponse(cal.to_ical(), content_type='text/calendar')
 
 
 @csrf_exempt
