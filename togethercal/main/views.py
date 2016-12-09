@@ -107,7 +107,9 @@ def ical_view(request):
             alarm.add('trigger', timedelta(hours=-1))
             event.add_component(alarm)
             cal.add_component(event)
-    return HttpResponse(cal.to_ical(), content_type='text/calendar')
+    response = HttpResponse(cal.to_ical(), content_type='text/calendar')
+    response['Content-Disposition'] = 'filename="family.ics"'
+    return response
 
 
 @csrf_exempt
