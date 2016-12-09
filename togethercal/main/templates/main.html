@@ -57,6 +57,7 @@
         function load(offset) {
           var slick = getSlick();
           var elem = $(slick.$slides[offset]).eq(0); // TODO handle array out of bounds
+          offset += {{ offset }}; // base date
           elem.load('/day/?offset=' + offset);
         }
 
